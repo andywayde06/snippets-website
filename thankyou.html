@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thank You — Snippets PRO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#12141c; --surface:#1e2230; --border:#333a52;
+  --text:#f1eee6; --text-dim:#a9adc1; --text-faint:#6b7086;
+  --amber:#e3a34c; --amber-soft:#3a2f1c; --teal:#5fbf9b; --teal-soft:#17332b;
+  --serif:'Inter',system-ui,-apple-system,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--serif); min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center;}
+.wrap{max-width:440px; padding:40px 24px;}
+a{color:inherit; text-decoration:none;}
+.mono{font-family:var(--mono);}
+.check{width:56px; height:56px; margin:0 auto 24px; border-radius:50%; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; font-size:26px;}
+h1{font-size:24px; margin:0 0 12px;}
+p{color:var(--text-dim); font-size:15px; line-height:1.6; margin:0 0 28px;}
+.card{border:1px solid var(--border); border-radius:12px; background:var(--surface); padding:20px; margin-bottom:28px; text-align:left;}
+.card .row{display:flex; justify-content:space-between; font-size:13.5px; color:var(--text-dim); padding:6px 0;}
+.card .row span:last-child{color:var(--text); font-family:var(--mono);}
+.btn{display:inline-block; padding:12px 22px; border-radius:8px; background:var(--amber); color:#221806; font-weight:600; font-size:14px;}
+.btn:hover{background:#edb166;}
+.foot{margin-top:22px; font-size:12.5px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="check">✓</div>
+  <h1>You're all set — welcome to PRO.</h1>
+  <p>Thanks for upgrading to Snippets PRO. Your unlimited snippets are unlocked and ready to use — everything still runs 100% locally on your PC.</p>
+  <div class="card">
+    <div class="row"><span>Plan</span><span>Snippets PRO</span></div>
+    <div class="row"><span>Type</span><span>One-time purchase</span></div>
+  </div>
+  <a href="https://snippetsapp.pro/" class="btn">Back to Snippets</a>
+  <div class="foot">A receipt has been sent to your email by Paddle.</div>
+</div>
+</body>
+</html>
