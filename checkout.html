@@ -46,6 +46,10 @@ ul.feat li span{color:var(--teal); font-family:var(--mono);}
 .buy:hover{background:#edb166; transform:translateY(-1px);}
 .privacy-note{margin-top:18px; text-align:center; font-size:12.5px; color:var(--text-faint);}
 .secure{margin-top:10px; text-align:center; font-size:12px; color:var(--text-faint); font-family:var(--mono);}
+.buy:disabled{opacity:.55;cursor:wait;transform:none;}
+.retry{color:var(--amber);background:transparent;border:1px solid var(--border);border-radius:6px;padding:8px 12px;cursor:pointer;}
+button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:4px;}
+.now{overflow-wrap:anywhere;}
 </style>
 </head>
 <body>
@@ -59,7 +63,7 @@ ul.feat li span{color:var(--teal); font-family:var(--mono);}
 <main>
   <div class="wrap">
     <h1>Checkout</h1>
-    <p class="subtle">You're upgrading to Snippets PRO — unlocked instantly after purchase.</p>
+    <p class="subtle">Snippets Pro is a one-time purchase. Pro activation and license delivery follow payment.</p>
 
     <div class="card">
       <div class="plan-row">
@@ -71,9 +75,7 @@ ul.feat li span{color:var(--teal); font-family:var(--mono);}
       </div>
 
       <div class="price-row">
-        <span class="was">$20.99</span>
-        <span class="now">$14.99</span>
-        <span class="badge">Save 29%</span>
+        <span id="localized-price" class="now" aria-live="polite">Loading price…</span>
       </div>
       <div class="onetime">One-time purchase — not a subscription</div>
 
@@ -81,11 +83,14 @@ ul.feat li span{color:var(--teal); font-family:var(--mono);}
         <li><span>✓</span>Unlimited active snippets</li>
         <li><span>✓</span>Everything in Snippets FREE</li>
         <li><span>✓</span>Future Pro features included</li>
-        <li><span>✓</span>100% local — nothing ever leaves your PC</li>
+        <li><span>✓</span>Snippet processing stays on your PC</li>
       </ul>
 
-      <button id="buy-btn" class="buy">Buy Snippets Pro</button>
-      <div class="secure">Secure checkout powered by Paddle</div>
+      <button id="buy-btn" class="buy" type="button" disabled>Buy Snippets Pro</button>
+      <p id="checkout-status" class="privacy-note" role="status" aria-live="polite">Loading secure checkout…</p>
+      <button id="retry-btn" class="retry" type="button" hidden>Retry loading price</button>
+      <div class="secure">Paddle Sandbox — test payments only</div>
+      <noscript><p>Enable JavaScript to load your localized price and open checkout.</p></noscript>
       <div class="privacy-note">Your snippets stay fully private — this only processes payment, never your snippet content.</div>
     </div>
   </div>
@@ -94,22 +99,93 @@ ul.feat li span{color:var(--teal); font-family:var(--mono);}
 <!-- Paddle Billing (v2) checkout -->
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
-  // Replace with your real Paddle client-side token and price ID before going live.
-  // Remove the sandbox line once you switch to your live Paddle account.
-  Paddle.Environment.set('sandbox');
-  Paddle.Initialize({ token: 'YOUR_PADDLE_CLIENT_TOKEN' });
-
-  document.getElementById('buy-btn').addEventListener('click', function () {
-    Paddle.Checkout.open({
-      items: [{ priceId: 'YOUR_PADDLE_PRICE_ID', quantity: 1 }],
-      settings: {
-        displayMode: 'overlay',
-        variant: 'one-page',
-        theme: 'dark',
-        successUrl: '/thankyou.html'
-      }
-    });
+(function () {
+  'use strict';
+  // Public client-side configuration only. This page is intentionally Sandbox-only.
+  // Default payment link: https://snippetsapp.pro/checkout.html
+  const config = Object.freeze({
+    clientToken: 'test_0b3f1f2baa93e77d03eba75de9d',
+    priceId: 'pri_01m3a66zd7twd0y1stfrj4gp8y'
   });
+  // Resolves beside this page, including GitHub Pages project subdirectories.
+  const successUrl = new URL('thankyou.html', window.location.href).href;
+  const settings = { displayMode: 'overlay', variant: 'one-page', theme: 'dark', successUrl };
+  const items = [{ priceId: config.priceId, quantity: 1 }];
+  const buy = document.getElementById('buy-btn');
+  const price = document.getElementById('localized-price');
+  const status = document.getElementById('checkout-status');
+  const retry = document.getElementById('retry-btn');
+  let ready = false;
+  let opening = false;
+
+  function checkoutEvent(event) {
+    if (event.name === 'checkout.loaded') {
+      opening = false;
+      buy.disabled = !ready;
+      status.textContent = 'Complete your test payment in the secure checkout.';
+    } else if (event.name === 'checkout.closed') {
+      opening = false;
+      buy.disabled = !ready;
+      status.textContent = 'Checkout closed. You can open it again when ready.';
+    } else if (event.name === 'checkout.error' || event.name === 'checkout.payment.error' ||
+               event.name === 'checkout.payment-error') {
+      opening = false;
+      buy.disabled = !ready;
+      status.textContent = 'Checkout could not complete. Please retry; if this continues, contact Snippets support.';
+    } else if (event.name === 'checkout.completed') {
+      // UX only: this does not provision a license or prove payment to a backend.
+      window.location.assign(successUrl);
+    }
+  }
+
+  async function loadPrice() {
+    ready = false;
+    buy.disabled = true;
+    retry.hidden = true;
+    price.textContent = 'Loading price…';
+    status.textContent = 'Loading your localized price from Paddle…';
+    try {
+      // No country, IP or currency override: Paddle detects the visitor's location.
+      const response = await Paddle.PricePreview({ items });
+      const item = response.data.details.lineItems.find(line => line.price.id === config.priceId);
+      if (!item || typeof item.formattedTotals.total !== 'string') throw new Error('Price unavailable');
+      price.textContent = item.formattedTotals.total; // Display exactly as Paddle formatted it.
+      ready = true;
+      buy.disabled = opening;
+      status.textContent = 'One-time payment. No subscription or free trial. Final total is confirmed in checkout.';
+    } catch (_) {
+      price.textContent = 'Price unavailable';
+      status.textContent = 'We could not load your price. Check your connection and retry.';
+      retry.hidden = false;
+    }
+  }
+
+  retry.addEventListener('click', loadPrice);
+  buy.addEventListener('click', function () {
+    if (!ready || opening) return;
+    opening = true;
+    buy.disabled = true;
+    status.textContent = 'Opening secure checkout…';
+    try {
+      Paddle.Checkout.open({ items, settings });
+    } catch (_) {
+      opening = false;
+      buy.disabled = false;
+      status.textContent = 'Checkout could not open. Please retry.';
+    }
+  });
+
+  try {
+    if (!window.Paddle || !config.clientToken.startsWith('test_')) throw new Error('Sandbox unavailable');
+    Paddle.Environment.set('sandbox');
+    // Defaults also apply to Paddle payment links with a _ptxn query parameter.
+    Paddle.Initialize({ token: config.clientToken, checkout: { settings }, eventCallback: checkoutEvent });
+    loadPrice();
+  } catch (_) {
+    price.textContent = 'Checkout unavailable';
+    status.textContent = 'Secure checkout could not load. Check your connection or content blocker and reload this page.';
+  }
+})();
 </script>
 </body>
 </html>
