@@ -47,7 +47,8 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; paddi
 .plan-icon{width:40px; height:40px; border-radius:10px; margin-bottom:14px;}
 .navlinks{display:flex; gap:28px; font-size:14px; color:var(--text-dim);}
 .navlinks a:hover{color:var(--text);}
-@media (max-width:720px){ .navlinks{display:none;} }
+@media (max-width:960px){ .navlinks{gap:20px;} }
+@media (max-width:820px){ .navlinks{display:none;} }
 .btn{display:inline-flex; align-items:center; gap:8px; padding:11px 20px; border-radius:8px; font-size:14px; font-weight:600; text-decoration:none; border:1px solid transparent; cursor:pointer; transition:transform .15s ease, background .15s ease;}
 .btn-primary{background:var(--amber); color:#221806;}
 .btn-primary:hover{background:#edb166; transform:translateY(-1px);}
@@ -291,6 +292,7 @@ footer{border-top:1px solid var(--border); padding:56px 0 40px;}
       <a href="#pro">Pro</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
+      <a href="#contact">Support</a>
     </div>
     <a href="https://github.com/andywayde06/snippets-update-feed/releases/download/v1.8.0/Snippets-1.8.0-Setup.exe" class="btn btn-primary btn-sm">Download Snippets FREE</a>
   </div>
@@ -809,7 +811,7 @@ footer{border-top:1px solid var(--border); padding:56px 0 40px;}
     </div>
     <div class="mock">
       <div class="mock-bar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-title">to: support@snippetsapp.pro</span></div>
-      <form class="contact-form" id="contact-form" action="https://formsubmit.co/support@snippetsapp.pro" method="POST">
+      <form class="contact-form" id="contact-form" action="https://api.web3forms.com/submit" method="POST">
         <div class="contact-row">
           <label>Name (optional)
             <input class="contact-field" id="contact-name" name="name" maxlength="100" autocomplete="name" placeholder="Your name">
@@ -829,9 +831,10 @@ footer{border-top:1px solid var(--border); padding:56px 0 40px;}
         <label>Message
           <textarea class="contact-field" id="contact-message" name="message" rows="6" maxlength="5000" required placeholder="What's going on? The more detail, the faster we can help."></textarea>
         </label>
-        <input type="hidden" name="_subject" value="Snippets support request">
-        <input type="hidden" name="_template" value="table">
-        <label class="contact-hp" aria-hidden="true">Leave this empty <input name="_honey" tabindex="-1" autocomplete="off"></label>
+        <input type="hidden" name="access_key" value="f3bfb59e-b9c7-4d6c-a1a8-65610644e44b">
+        <input type="hidden" name="subject" value="Snippets support request">
+        <input type="hidden" name="from_name" value="Snippets website">
+        <label class="contact-hp" aria-hidden="true">Leave this unchecked <input type="checkbox" name="botcheck" tabindex="-1"></label>
         <div class="contact-foot">
           <span class="contact-note">We'll only use your email to reply to you.</span>
           <button class="btn btn-primary" type="submit" id="contact-send">Send message</button>
@@ -851,14 +854,14 @@ footer{border-top:1px solid var(--border); padding:56px 0 40px;}
 <script>
 (() => {
   const ADDRESS = "support@snippetsapp.pro";
-  // FormSubmit relays the form to ADDRESS by email. The very first submission
-  // sends an activation link to that inbox; nothing is delivered until it's clicked.
-  const ENDPOINT = "https://formsubmit.co/ajax/" + ADDRESS;
+  // Web3Forms emails submissions to the inbox its access_key (a hidden field
+  // in the form) was created for, which is ADDRESS. The key is public by design.
+  const ENDPOINT = "https://api.web3forms.com/submit";
   const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const $ = (id) => document.getElementById(id);
   const form = $("contact-form"), send = $("contact-send"), error = $("contact-error");
   const done = $("contact-done"), doneTitle = $("contact-done-title"), doneEmail = $("contact-done-email");
-  // Without JavaScript the form still posts to FormSubmit with native validation.
+  // Without JavaScript the form still posts to Web3Forms with native validation.
   form.noValidate = true;
 
   function fail(text, field, mailto) {
@@ -893,7 +896,7 @@ footer{border-top:1px solid var(--border); padding:56px 0 40px;}
     if (!email) return fail("Enter your email address so we can reply.", $("contact-email"));
     if (!EMAIL_PATTERN.test(email)) return fail("That email address doesn't look quite right.", $("contact-email"));
     if (!message) return fail("Write a message before sending.", $("contact-message"));
-    if (data._honey) return finish(email); // only bots fill the hidden field
+    if (data.botcheck) return finish(email); // only bots tick the hidden checkbox
     send.disabled = true;
     send.textContent = "Sending…";
     try {
@@ -902,15 +905,15 @@ footer{border-top:1px solid var(--border); padding:56px 0 40px;}
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           ...data, name, email, message,
-          _replyto: email,
-          _subject: "[Snippets] " + data.topic + " — " + (name || email),
-          _captcha: "false",
+          replyto: email,
+          subject: "[Snippets] " + data.topic + " — " + (name || email),
         }),
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || String(result.success) !== "true") throw new Error(result.message);
+      if (!response.ok || String(result.success) !== "true") throw new Error(result.message || "HTTP " + response.status);
       finish(email);
-    } catch {
+    } catch (problem) {
+      console.error("Contact form: message not sent —", problem.message);
       const mailto = "mailto:" + ADDRESS + "?subject=" + encodeURIComponent("Snippets support: " + data.topic) + "&body=" + encodeURIComponent(message);
       fail("Your message couldn't be sent. Please try again, or email us directly at ", null, mailto);
     } finally {
