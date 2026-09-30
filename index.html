@@ -222,6 +222,43 @@ summary::after{content:"+"; color:var(--text-faint); font-size:20px; flex-shrink
 details[open] summary::after{content:"–";}
 details p{margin-top:12px; color:var(--text-dim); font-size:14.5px; max-width:65ch;}
 
+/* contact */
+.contact{background:var(--bg-2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);}
+.contact [hidden]{display:none;}
+.contact-grid{display:grid; grid-template-columns:1fr 1.15fr; gap:56px; align-items:start;}
+@media (max-width:860px){ .contact-grid{grid-template-columns:1fr;} }
+.contact-tips{margin-top:28px; display:grid; gap:14px;}
+.contact-tip{display:grid; grid-template-columns:92px 1fr; gap:14px; align-items:baseline; font-size:14.5px; color:var(--text-dim);}
+.contact-tip .trig{font-family:var(--mono); font-size:13px; color:var(--amber); background:var(--amber-soft); padding:4px 8px; border-radius:6px; text-align:center;}
+.contact-direct{margin-top:28px; padding:16px 18px; border-left:2px solid var(--amber); background:var(--surface); border-radius:0 8px 8px 0; font-size:14px; color:var(--text-dim);}
+.contact-direct a,.contact-error a{color:var(--amber); font-family:var(--mono); text-decoration:none; overflow-wrap:anywhere;}
+.contact-direct a:hover,.contact-error a:hover{text-decoration:underline;}
+.contact .mock-title{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.contact-form{display:grid; gap:14px; padding:20px;}
+.contact-row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media (max-width:560px){ .contact-row{grid-template-columns:1fr;} }
+.contact-form label{display:grid; gap:6px; font-size:12.5px; color:var(--text-faint); font-family:var(--mono);}
+.contact-field{width:100%; font:14px var(--serif); color:var(--text); background:var(--bg-2); border:1px solid var(--border); border-radius:8px; padding:10px 12px;}
+.contact-field::placeholder{color:var(--text-faint);}
+.contact-field:focus-visible{outline:2px solid var(--amber); outline-offset:1px;}
+.contact-field[aria-invalid="true"]{border-color:var(--danger);}
+textarea.contact-field{resize:vertical; min-height:150px; line-height:1.55;}
+select.contact-field{appearance:none; cursor:pointer; padding-right:36px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236b7086' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 13px center;}
+.contact-hp{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;}
+.contact-foot{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:4px;}
+.contact-note{font-size:13px; color:var(--text-faint);}
+.contact .btn{font-family:inherit;}
+.contact .btn-ghost{background:none;}
+.contact-form .btn:disabled{opacity:.65; cursor:progress; transform:none; background:var(--amber);}
+.contact-error{margin:0; font-size:13px; color:var(--danger);}
+.contact-error:empty{display:none;}
+.contact-done{padding:44px 28px; text-align:center;}
+.contact-done .badge{margin-bottom:16px;}
+.contact-done h3{font-size:20px;}
+.contact-done h3:focus{outline:none;}
+.contact-done p{margin:10px auto 24px; color:var(--text-dim); font-size:14.5px; max-width:40ch;}
+.contact-done .mono{color:var(--amber); overflow-wrap:anywhere;}
+
 /* final cta */
 .final{text-align:center;}
 .final h2{font-size:36px; max-width:20ch; margin:0 auto;}
@@ -757,6 +794,139 @@ footer{border-top:1px solid var(--border); padding:56px 0 40px;}
   </div>
 </section>
 
+<section id="contact" class="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <div class="eyebrow">contact support</div>
+      <h2 style="font-size:32px;">Still have a question? Just ask.</h2>
+      <p class="section-sub">Bug reports, license questions, feature ideas — send us a message and it goes straight to the Snippets support inbox.</p>
+      <div class="contact-tips">
+        <div class="contact-tip"><span class="trig">_bug</span><span>Include your Windows version, your Snippets version, and the app you were typing in.</span></div>
+        <div class="contact-tip"><span class="trig">_license</span><span>Use the email address you bought Pro with, so we can find your purchase.</span></div>
+        <div class="contact-tip"><span class="trig">_idea</span><span>Tell us what you'd use it for — it helps us build the right thing.</span></div>
+      </div>
+      <p class="contact-direct">Prefer your own email app? Write to <a href="mailto:support@snippetsapp.pro">support@snippetsapp.pro</a></p>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-title">to: support@snippetsapp.pro</span></div>
+      <form class="contact-form" id="contact-form" action="https://formsubmit.co/support@snippetsapp.pro" method="POST">
+        <div class="contact-row">
+          <label>Name (optional)
+            <input class="contact-field" id="contact-name" name="name" maxlength="100" autocomplete="name" placeholder="Your name">
+          </label>
+          <label>Email
+            <input class="contact-field" id="contact-email" name="email" type="email" maxlength="200" autocomplete="email" required placeholder="you@example.com">
+          </label>
+        </div>
+        <label>Topic
+          <select class="contact-field" name="topic">
+            <option>General question</option>
+            <option>Bug report</option>
+            <option>License &amp; purchase</option>
+            <option>Feature request</option>
+          </select>
+        </label>
+        <label>Message
+          <textarea class="contact-field" id="contact-message" name="message" rows="6" maxlength="5000" required placeholder="What's going on? The more detail, the faster we can help."></textarea>
+        </label>
+        <input type="hidden" name="_subject" value="Snippets support request">
+        <input type="hidden" name="_template" value="table">
+        <label class="contact-hp" aria-hidden="true">Leave this empty <input name="_honey" tabindex="-1" autocomplete="off"></label>
+        <div class="contact-foot">
+          <span class="contact-note">We'll only use your email to reply to you.</span>
+          <button class="btn btn-primary" type="submit" id="contact-send">Send message</button>
+        </div>
+        <p class="contact-error" id="contact-error" role="alert"></p>
+      </form>
+      <div class="contact-done" id="contact-done" hidden>
+        <span class="badge">Message sent</span>
+        <h3 id="contact-done-title" tabindex="-1">Thanks — we've got it.</h3>
+        <p>We'll reply to <span class="mono" id="contact-done-email"></span> as soon as we can.</p>
+        <button class="btn btn-ghost btn-sm" type="button" id="contact-again">Send another message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(() => {
+  const ADDRESS = "support@snippetsapp.pro";
+  // FormSubmit relays the form to ADDRESS by email. The very first submission
+  // sends an activation link to that inbox; nothing is delivered until it's clicked.
+  const ENDPOINT = "https://formsubmit.co/ajax/" + ADDRESS;
+  const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const $ = (id) => document.getElementById(id);
+  const form = $("contact-form"), send = $("contact-send"), error = $("contact-error");
+  const done = $("contact-done"), doneTitle = $("contact-done-title"), doneEmail = $("contact-done-email");
+  // Without JavaScript the form still posts to FormSubmit with native validation.
+  form.noValidate = true;
+
+  function fail(text, field, mailto) {
+    error.replaceChildren(text);
+    if (mailto) {
+      const link = document.createElement("a");
+      link.href = mailto;
+      link.textContent = ADDRESS;
+      error.append(link, ".");
+    }
+    if (field) {
+      field.setAttribute("aria-invalid", "true");
+      field.focus();
+    }
+  }
+
+  function finish(email) {
+    doneEmail.textContent = email;
+    form.reset();
+    form.hidden = true;
+    done.hidden = false;
+    doneTitle.focus();
+  }
+
+  form.addEventListener("input", (event) => event.target.removeAttribute("aria-invalid"));
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    const name = data.name.trim(), email = data.email.trim(), message = data.message.trim();
+    error.replaceChildren();
+    if (!email) return fail("Enter your email address so we can reply.", $("contact-email"));
+    if (!EMAIL_PATTERN.test(email)) return fail("That email address doesn't look quite right.", $("contact-email"));
+    if (!message) return fail("Write a message before sending.", $("contact-message"));
+    if (data._honey) return finish(email); // only bots fill the hidden field
+    send.disabled = true;
+    send.textContent = "Sending…";
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          ...data, name, email, message,
+          _replyto: email,
+          _subject: "[Snippets] " + data.topic + " — " + (name || email),
+          _captcha: "false",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || String(result.success) !== "true") throw new Error(result.message);
+      finish(email);
+    } catch {
+      const mailto = "mailto:" + ADDRESS + "?subject=" + encodeURIComponent("Snippets support: " + data.topic) + "&body=" + encodeURIComponent(message);
+      fail("Your message couldn't be sent. Please try again, or email us directly at ", null, mailto);
+    } finally {
+      send.disabled = false;
+      send.textContent = "Send message";
+    }
+  });
+
+  $("contact-again").addEventListener("click", () => {
+    done.hidden = true;
+    form.hidden = false;
+    $("contact-name").focus();
+  });
+})();
+</script>
+
 <section id="download" class="final">
   <div class="wrap">
     <div class="eyebrow">the private text expander you actually own</div>
@@ -777,7 +947,7 @@ footer{border-top:1px solid var(--border); padding:56px 0 40px;}
         <p style="margin-top:14px; color:var(--text-faint); font-size:13.5px; max-width:32ch;">The private, local-first text expander for Windows — one purchase, yours to keep.</p>
       </div>
       <div><h4>Product</h4><ul><li><a href="#how">How it works</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#pro">Snippets Pro</a></li><li><a href="#pricing">Pricing</a></li></ul></div>
-      <div><h4>Company</h4><ul><li><a href="#">Terms</a></li><li><a href="#">Privacy policy</a></li><li><a href="#">Contact</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">Terms</a></li><li><a href="#">Privacy policy</a></li><li><a href="#contact">Contact</a></li></ul></div>
       <div><h4>Resources</h4><ul><li><a href="#">Documentation</a></li><li><a href="#faq">FAQ</a></li></ul></div>
       <div><h4>Get Snippets</h4><ul><li><a href="https://github.com/andywayde06/snippets-update-feed/releases/download/v1.8.0/Snippets-1.8.0-Setup.exe">Windows download</a></li></ul></div>
     </div>
